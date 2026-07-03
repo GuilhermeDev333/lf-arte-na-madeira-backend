@@ -514,7 +514,7 @@ function renderizarCategorias(categorias) {
 };
 
             try {
-                const res = await fetch('http://localhost:3000/api/produtos', {
+                const res = await fetch('/api/produtos', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(novoProd)
@@ -541,7 +541,7 @@ function renderizarCategorias(categorias) {
             };
 
             try {
-                const res = await fetch('http://localhost:3000/api/categorias', {
+                const res = await fetch('/api/categorias', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(novaCat)

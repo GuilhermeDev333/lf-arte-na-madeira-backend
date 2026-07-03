@@ -84,6 +84,7 @@
         async function inicializarLoja() {
             try {
                 const resCategorias = await fetch('/api/categorias');
+                if (!resCategorias.ok) throw new Error(`Falha ao carregar categorias: ${resCategorias.status}`);
                 const categorias = await resCategorias.json();
                 
                 const filtrosContainer = document.querySelector('.filtros-container');
@@ -93,6 +94,7 @@
                 `;
 
                 const resProdutos = await fetch('/api/produtos');
+                if (!resProdutos.ok) throw new Error(`Falha ao carregar produtos: ${resProdutos.status}`);
                 todosOsProdutos = await resProdutos.json();
                 renderizarCards(todosOsProdutos);
 
@@ -300,28 +302,7 @@
             }
         }
 
-      async function inicializarLoja() {
-    try {
-        // 1. Mudado para rota relativa (funciona tanto local quanto online)
-        const resCategorias = await fetch('/api/categorias');
-        const categorias = await resCategorias.json();
-        
-        const filtrosContainer = document.querySelector('.filtros-container');
-        filtrosContainer.innerHTML = `
-            <button class="btn-filtro ativo" onclick="filtrarProdutos('todos', this)">Ver Todos</button>
-            ${categorias.map(c => `<button class="btn-filtro" onclick="filtrarProdutos('${c.id}', this)">${c.nome}</button>`).join('')}
-        `;
-
-        // 2. Mudado para rota relativa aqui também
-        const resProdutos = await fetch('/api/produtos');
-        todosOsProdutos = await resProdutos.json();
-        renderizarCards(todosOsProdutos);
-
-    } catch (error) {
-        console.error("Erro ao inicializar:", error);
-        document.getElementById('vitrine-produtos').innerHTML = '<p>Erro ao conectar com a loja.</p>';
-    }
-}
+        inicializarLoja();
     </script>
 </body>
 </html>
