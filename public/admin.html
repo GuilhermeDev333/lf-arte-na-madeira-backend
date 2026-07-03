@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Painel Administrativo - LF Arte na Madeira</title>
+       <link rel="shortcut icon" href="logo_oficina.png" type="logo_oficina.png">
+    <style>
+        /* --- ESTILOS GLOBAIS --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f5f0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        background: linear-gradient(135deg, #0b4a74 0%, #161616 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 2rem; }
+        header p { margin: 5px 0 0 0; opacity: 0.8; font-size: 0.9rem; }
+
+        /* --- SINALIZADOR DE ABAS --- */
+        .abas-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .btn-aba {
+            background-color: #e0dcd3;
+            color: #5c3a21;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 200px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn-aba.ativa {
+            background-color: #0a3955;
+            color: white;
+            box-shadow: 0 4px 8px rgba(139,90,43,0.3);
+        }
+
+        .conteudo-aba {
+            display: none;
+        }
+
+        .conteudo-aba.ativa {
+            display: block;
+        }
+
+        /* --- LAYOUT EM COLUNAS --- */
+        .painel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 800px) {
+            .painel-grid { grid-template-columns: 1fr; }
+        }
+
+        .card-formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .card-formulario h3 { margin-top: 0; color: #5c3a21; border-bottom: 2px solid #f1ede6; padding-bottom: 8px; }
+
+        .form-grupo {
+            margin-bottom: 12px;
+        }
+
+        .form-grupo label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #666;
+        }
+
+        .form-grupo input, .form-grupo textarea, .form-grupo select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        /* --- CUSTOMIZAÇÃO DO BOTÃO DE UPLOAD --- */
+        .campo-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .campo-upload input[type="file"] {
+            display: none; /* Esconde o botão feio nativo */
+        }
+
+        .botao-upload-customizado {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #fcfbfa;
+            color: #5c3a21;
+            border: 2px dashed #d7ccc8;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            text-align: center;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .botao-upload-customizado:hover {
+            background-color: #f5f2eb;
+            border-color: #8B5A2B;
+        }
+
+        #nome-arquivo-selecionado {
+            font-size: 0.8rem;
+            color: #888;
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        form button[type="submit"] {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        form button[type="submit"]:hover { background-color: #1b5e20; }
+
+        /* --- LISTAS COMPACTAS COM ROLAGEM --- */
+        .lista-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lista-container h3 { margin-top: 0; color: #5c3a21; }
+
+        .scroll-lista {
+            max-height: 430px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .item-gerenciável {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-mini-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .item-texto strong { display: block; font-size: 0.95rem; }
+        .item-texto span { font-size: 0.8rem; color: #777; }
+
+        .btn-excluir {
+            background-color: #c62828;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-excluir:hover { background-color: #b71c1c; }
+
+        /* --- CONTAINER QUE SEGURA AS MENSAGENS NO CANTO DA TELA --- */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* --- ESTILO DE CADA MENSAGEM (TOAST) --- */
+        .toast {
+            background: #ffffff;
+            color: #333333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            min-width: 280px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 6px solid #ccc;
+            font-family: sans-serif;
+        }
+
+        .toast.mostrar {
+            transform: translateX(0);
+        }
+
+        .toast.sucesso { border-left-color: #2e7d32; }
+        .toast.erro { border-left-color: #c62828; }
+        .toast.aviso { border-left-color: #ef6c00; }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <header>
+            <h1>Painel Administrativo</h1>
+            <p>LF Arte na Madeira — Gerenciamento do Sistema</p>
+        </header>
+
+        <div class="abas-container">
+            <button class="btn-aba ativa" onclick="mudarAba('aba-produtos', this)">📦 Produtos</button>
+            <button class="btn-aba" onclick="mudarAba('aba-categorias', this)">📁 Categorias</button>
+        </div>
+
+        <div id="aba-produtos" class="conteudo-aba ativa">
+            <div class="painel-grid">
+                <div class="card-formulario">
+                    <h3>Cadastrar Novo Produto</h3>
+                    <form id="form-produto" onsubmit="salvarProduto(event)">
+                        <div class="form-grupo">
+                            <label>Nome do Produto</label>
+                            <input type="text" id="prod-nome" required placeholder="Ex: Tábua de Carne Premium">
+                        </div>
+                        <div class="form-grupo">
+                            <label>Categoria</label>
+                            <select id="prod-categoria" required>
+                                <option value="">Carregando categorias...</option>
+                            </select>
+                        </div>
+                        <div class="form-grupo">
+                            <label>Preço (R$)</label>
+                            <input type="number" id="prod-preco" step="0.01" required placeholder="0.00">
+                        </div>
+                        <div class="form-grupo">
+                            <label>Tipo de Madeira</label>
+                            <input type="text" id="prod-madeira" placeholder="Ex: Muiracatiara, Roxinho">
+                        </div>
+                        <div class="form-grupo">
+                            <label>Tamanho/Dimensões</label>
+                            <input type="text" id="prod-tamanho" placeholder="Ex: 50x30cm">
+                        </div>
+                        
+                        <div class="campo-upload">
+                            <label>Foto do Produto</label>
+                            <label for="prod-imagem" class="botao-upload-customizado">
+                                📁 Escolher Imagem no Computador
+                            </label>
+                            <input type="file" id="prod-imagem" accept="image/*" required>
+                            <span id="nome-arquivo-selecionado">Nenhum arquivo selecionado</span>
+                        </div>
+
+                       
+                        <button type="submit">Salvar Produto</button>
+                    </form>
+                </div>
+
+                <div class="lista-container">
+                    <h3>Produtos Cadastrados</h3>
+                    <div class="scroll-lista" id="lista-produtos">
+                        <p>Carregando produtos...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="aba-categorias" class="conteudo-aba">
+            <div class="painel-grid">
+                <div class="card-formulario">
+                    <h3>Cadastrar Nova Categoria</h3>
+                    <form id="form-categoria" onsubmit="salvarCategoria(event)">
+                        <div class="form-grupo">
+                            <label>Identificador (ID sem espaços ou acentos)</label>
+                            <input type="text" id="cat-id" required placeholder="Ex: tabuas, petisqueiras">
+                        </div>
+                        <div class="form-grupo">
+                            <label>Nome Visível</label>
+                            <input type="text" id="cat-nome" required placeholder="Ex: Tábuas, Petisqueiras">
+                        </div>
+                        <button type="submit">Salvar Categoria</button>
+                    </form>
+                </div>
+
+                <div class="lista-container">
+                    <h3>Categorias Cadastradas</h3>
+                    <div class="scroll-lista" id="lista-categorias">
+                        <p>Carregando categorias...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- FUNÇÃO PARA GERAR O ALERTA BONITO ---
+        function mostrarMensagem(texto, tipo = 'sucesso') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let emoji = '✅';
+            if (tipo === 'erro') emoji = '❌';
+            if (tipo === 'aviso') emoji = '⚠️';
+
+            toast.className = `toast ${tipo}`;
+            toast.innerHTML = `<span>${emoji}</span> <span>${texto}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('mostrar'), 10);
+
+            setTimeout(() => {
+                toast.classList.remove('mostrar');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // --- NAVEGAÇÃO DE ABAS ---
+        function mudarAba(idAba, botao) {
+            document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.remove('ativa'));
+            document.querySelectorAll('.btn-aba').forEach(btn => btn.classList.remove('ativa'));
+            
+            document.getElementById(idAba).classList.add('ativa');
+            botao.classList.add('ativa');
+        }
+
+        // --- AUXILIAR: LER ARQUIVO DO PC ---
+        function lerArquivoComoBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- CARREGAR DADOS DO BACKEND ---
+        async function carregarDados() {
+            try {
+                const resCat = await fetch('http://localhost:3000/api/categorias');
+                const categorias = await resCat.json();
+                renderizarCategorias(categorias);
+
+                const resProd = await fetch('http://localhost:3000/api/produtos');
+                const produtos = await resProd.json();
+                renderizarProdutos(produtos);
+            } catch (error) {
+                console.error("Erro ao carregar dados do painel:", error);
+            }
+        }
+
+        // --- RENDERIZAR PRODUTOS NA TELA ---
+        // --- RENDERIZAR PRODUTOS NA TELA (VERSÃO CORRIGIDA) ---
+function renderizarProdutos(produtos) {
+    const container = document.getElementById('lista-produtos');
+    container.innerHTML = '';
+
+    // Se o banco responder vazio ou não for um array, limpa a tela e não trava
+    if(!produtos || !Array.isArray(produtos) || produtos.length === 0) {
+        container.innerHTML = '<p>Nenhum produto cadastrado.</p>';
+        return;
+    }
+
+    produtos.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'item-gerenciável';
+        
+        // Garante que o preço sempre seja um número válido antes de dar o toFixed
+        const precoFormatado = p.preco ? Number(p.preco).toFixed(2) : '0.00';
+        // Se imagem_url vier nula, usa a logo padrão
+        const fotoUrl = p.imagem_url || 'logo_oficina.png';
+
+        item.innerHTML = `
+            <div class="item-info">
+                <img src="${fotoUrl}" class="item-mini-img" onerror="this.src='logo_oficina.png'">
+                <div class="item-texto">
+                    <strong>${p.nome || 'Produto Sem Nome'}</strong>
+                    <span>R$ ${precoFormatado}</span>
+                </div>
+            </div>
+            <button class="btn-excluir" onclick="excluirProduto(${p.id})">Excluir</button>
+        `;
+        container.appendChild(item);
+    });
+}
+
+// --- RENDERIZAR CATEGORIAS NA TELA (VERSÃO CORRIGIDA) ---
+function renderizarCategorias(categorias) {
+    const container = document.getElementById('lista-categorias');
+    const selectProduto = document.getElementById('prod-categoria');
+    
+    container.innerHTML = '';
+    if (selectProduto) selectProduto.innerHTML = '<option value="">Selecione uma categoria</option>';
+
+    if(!categorias || !Array.isArray(categorias) || categorias.length === 0) {
+        container.innerHTML = '<p>Nenhuma categoria cadastrada.</p>';
+        return;
+    }
+
+    categorias.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'item-gerenciável';
+        item.innerHTML = `
+            <div class="item-info">
+                <div class="item-texto">
+                    <strong>${c.nome}</strong>
+                    <span>ID: ${c.id}</span>
+                </div>
+            </div>
+            <button class="btn-excluir" onclick="excluirCategoria('${c.id}')">Excluir</button>
+        `;
+        container.appendChild(item);
+
+        if (selectProduto) {
+            const option = document.createElement('option');
+            option.value = c.id;
+            option.textContent = c.nome;
+            selectProduto.appendChild(option);
+        }
+    });
+}
+
+        // --- CADASTRAR PRODUTO ---
+        // --- CADASTRAR PRODUTO ---
+        async function salvarProduto(e) {
+            e.preventDefault();
+
+            const arquivoImagem = document.getElementById('prod-imagem').files[0];
+            let imagemString = 'logo_oficina.png'; 
+
+            if (arquivoImagem) {
+                try {
+                    imagemString = await lerArquivoComoBase64(arquivoImagem);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            const novoProd = {
+    nome: document.getElementById('prod-nome').value,
+    categoria: document.getElementById('prod-categoria').value,
+    preco: parseFloat(document.getElementById('prod-preco').value),
+    tipo_madeira: document.getElementById('prod-madeira').value,
+    tamanho: document.getElementById('prod-tamanho').value,
+    imagem_url: imagemString,
+    descricao: "",
+    permite_personalizacao: true // ✅ Força sempre como verdadeiro
+};
+
+            try {
+                const res = await fetch('http://localhost:3000/api/produtos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(novoProd)
+                });
+                if(res.ok) {
+                    mostrarMensagem('Produto cadastrado com sucesso!', 'sucesso');
+                    document.getElementById('form-produto').reset();
+                    document.getElementById('nome-arquivo-selecionado').innerText = "Nenhum arquivo selecionado";
+                    carregarDados();
+                } else {
+                    mostrarMensagem('O servidor rejeitou os dados.', 'erro');
+                }
+            } catch (err) { 
+                mostrarMensagem('Erro ao conectar com o servidor.', 'erro');
+            }
+        }
+
+        // --- CADASTRAR CATEGORIA ---
+        async function salvarCategoria(e) {
+            e.preventDefault();
+            const novaCat = {
+                id: document.getElementById('cat-id').value,
+                nome: document.getElementById('cat-nome').value
+            };
+
+            try {
+                const res = await fetch('http://localhost:3000/api/categorias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(novaCat)
+                });
+                
+                if(res.ok) {
+                    mostrarMensagem('Categoria cadastrada com sucesso!', 'sucesso');
+                    document.getElementById('form-categoria').reset();
+                    carregarDados();
+                } else {
+                    const erroData = await res.json();
+                    mostrarMensagem(erroData.erro || 'Erro ao salvar.', 'erro');
+                }
+            } catch (err) { 
+                mostrarMensagem('Erro ao salvar categoria.', 'erro');
+            }
+        }
+
+        // --- REMOVER PRODUTO DIRETO ---
+        async function excluirProduto(id) {
+            try {
+                const res = await fetch(`http://localhost:3000/api/produtos/${id}`, {
+                    method: 'DELETE'
+                });
+                if(res.ok) {
+                    mostrarMensagem('Produto removido com sucesso!', 'sucesso');
+                    carregarDados();
+                } else {
+                    mostrarMensagem('Erro ao remover produto.', 'erro');
+                }
+            } catch (error) {
+                mostrarMensagem('Erro de conexão ao tentar deletar.', 'erro');
+            }
+        }
+
+        // --- REMOVER CATEGORIA DIRETA ---
+        async function excluirCategoria(id) {
+            try {
+                const res = await fetch(`http://localhost:3000/api/categorias/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    mostrarMensagem('Categoria removida com sucesso!', 'sucesso');
+                    carregarDados();
+                } else {
+                    const erroData = await res.json();
+                    mostrarMensagem(erroData.erro || 'Erro ao remover categoria.', 'aviso');
+                }
+            } catch (error) {
+                mostrarMensagem('Erro de conexão ao tentar deletar.', 'erro');
+            }
+        }
+
+        // --- ESCUTADOR PARA ATUALIZAR O NOME DO ARQUIVO NA TELA ---
+        document.getElementById('prod-imagem').addEventListener('change', function() {
+            const nomeArquivo = this.files[0] ? this.files[0].name : "Nenhum arquivo selecionado";
+            document.getElementById('nome-arquivo-selecionado').innerText = nomeArquivo;
+        });
+
+       // --- ATIVAR OS ESCUTADORES DOS FORMULÁRIOS ---
+
+
+// Inicialização
+carregarDados();
+    </script>
+</body>
+</html>

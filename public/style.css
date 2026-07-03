@@ -1,0 +1,562 @@
+   body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f5f0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- CABEÇALHO COM LOGO CENTRALIZADO NO MEIO E TEXTO EMBAIXO --- */
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centraliza tudo na horizontal */
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #0b4a74 0%, #161616 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column; /* Força o texto a ir para baixo da imagem */
+            align-items: center;
+            gap: 15px; /* Espaçamento entre o logo e o título */
+        }
+
+        .logo-img {
+            width: 200px; /* Um tamanho maior ideal para destaque no centro */
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #f1ede6;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            margin: 10px 0 0 0;
+            font-weight: 300;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* --- BARRA DE FILTROS --- */
+        .filtros-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap; /* Faz quebrar linha se não couber no celular */
+        }
+
+        .btn-filtro {
+            background-color: #e0dcd3;
+            color: #000000;
+            border: 1px solid ;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto;
+            white-space: nowrap;
+        }
+
+        .btn-filtro.ativo {
+            background-color: #185691;
+            color: white;
+        }
+
+        /* --- VITRINE E CARDS CORRIGIDOS (MAIS JUNTOS) --- */
+        .vitrine {
+            display: flex;
+            flex-wrap: wrap;       /* Permite que os cards quebrem linha */
+            justify-content: center; /* Centraliza o bloco de cards na tela */
+            gap: 25px;            /* Controla a distância exata entre um card e outro */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        .produto-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(230, 8, 8, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 280px; /* Largura fixa ideal para o card não esticar e nem afastar */
+            box-sizing: border-box;
+        }
+
+        
+
+        .produto-preco {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #000000;
+            margin: 10px 0;
+        }
+
+        .badge {
+            background-color: #ffe0b2;
+            color: #e65100;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            align-self: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .produto-card button {
+            background-color: #020202;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            width: 100%; /* Faz o botão de compra ocupar toda a largura do card */
+        }
+
+        .produto-card button:hover {
+            background-color: #3f3d3d;
+            transition: background 2s;
+        }
+
+        .produto-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .produto-specs {
+            font-size: 0.85rem;
+            color: #666;
+            background-color: #f1ede6;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+
+        .produto-specs strong {
+            color: #000000;
+        }
+
+        /* --- BOTÃO FLUTUANTE DO CARRINHO --- */
+        .btn-carrinho-flutuante {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- LATERAL DO CARRINHO (SIDEBAR) --- */
+        .carrinho-lateral {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 320px;
+            height: 100vh; /* Ocupa exatamente a altura da tela */
+            background-color: white;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .carrinho-lateral.aberto {
+            right: 0;
+        }
+
+        .carrinho-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1ede6;
+            padding-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .fechar-carrinho {
+            background: none;
+            color: #333;
+            font-size: 1.4rem;
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .carrinho-itens {
+            flex: 1;
+            overflow-y: auto; /* Rolagem acontece apenas na lista de produtos */
+            margin-top: 15px;
+            padding-right: 5px;
+        }
+
+        .item-carrinho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+          
+        }
+
+        .btn-remover {
+            background-color: #c62828;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* --- RODAPÉ FIXO DO CARRINHO --- */
+        .carrinho-rodape {
+            border-top: 2px solid #f1ede6;
+            padding-top: 15px;
+            margin-top: auto;
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .carrinho-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        /* Botão com contraste corrigido para leitura perfeita */
+        .btn-finalizar {
+            background-color: #1b5e20 !important;
+            color: #ffffff !important;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-finalizar:hover {
+            background-color: #0d3c11 !important;
+        }
+
+        /* ==========================================================================
+           ⚡ AJUSTES DE RESPONSIVIDADE (MEDIA QUERIES PARA CELULAR) ⚡
+           ========================================================================== */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* Diminui o espaçamento das bordas no celular */
+            }
+
+            header {
+                padding: 25px 15px;
+                margin-bottom: 25px;
+            }
+
+            .logo-img {
+                width: 130px; /* Diminui um pouco o tamanho da logo no celular */
+            }
+
+            header h1 {
+                font-size: 1.8rem; /* Reduz o tamanho da fonte para não quebrar feio */
+                letter-spacing: 1px;
+            }
+
+            header p {
+                font-size: 0.95rem;
+            }
+
+            .filtros-container {
+                gap: 6px;
+                margin-bottom: 20px;
+            }
+
+            .btn-filtro {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+
+            .vitrine {
+                gap: 15px; /* Deixa os cards ainda mais juntinhos na tela do celular */
+            }
+
+            .produto-card {
+                width: 100%; /* No celular o card ocupa o espaço disponível da linha de forma elegante */
+                max-width: 320px;
+            }
+
+            /* No celular, o carrinho se expande totalmente para melhor visualização */
+            .carrinho-lateral {
+                width: 100%;
+                right: -100%;
+                padding: 15px;
+            }
+        }
+        /* --- BLOCO DE PERSONALIZAÇÃO NO CARRINHO --- */
+.bloco-personalizacao {
+    background-color: #fcfbfa;
+    border-top: 1px solid #e0dcd3;
+    border-bottom: 1px solid #e0dcd3;
+    padding: 12px 15px;
+    margin: 10px 0;
+    font-family: inherit;
+}
+
+/* Customização da caixinha de marcar */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #5c3a21;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: #f5f2eb;
+    border: 2px solid #d7ccc8;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #e5e0d8;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #8B5A2B;
+    border-color: #8B5A2B;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 5px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Controle do input de texto que aparece/some */
+.campo-nome-escondido {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.campo-nome-escondido.visivel {
+    max-height: 50px;
+    opacity: 1;
+    margin-top: 8px;
+}
+
+.campo-nome-escondido input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+/* --- PERSONALIZAÇÃO DENTRO DO CARD --- */
+.card-personalizacao {
+    margin-bottom: 15px;
+    text-align: left;
+    background: #fdfbf7;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px dashed #d7ccc8;
+    /* Define uma altura fixa para quando o campo estiver fechado */
+    min-height: 42px; 
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.produto-nome {
+    font-size: 1.2rem;
+    margin: 0 0 15px 0;
+    color: #070707;
+    /* Adiciona uma altura fixa equivalente a duas linhas de texto */
+    min-height: 2.8rem; 
+    display: flex;
+    align-items: center; /* Centraliza verticalmente nomes de uma linha só */
+}
+
+.card-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #000000;
+    cursor: pointer;
+}
+
+.card-checkbox-label input {
+    cursor: pointer;
+    accent-color: #8B5A2B; /* Deixa o checkbox marronzinho nos navegadores modernos */
+}
+
+/* Esconde o input com transição */
+.input-nome-card-escondido {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.input-nome-card-escondido.visivel {
+    max-height: 40px;
+    opacity: 1;
+    margin-top: 6px;
+}
+
+.input-nome-card-escondido input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+}
+/* --- MODAL DE ALERTA PERSONALIZADO --- */
+.alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4); /* Fundo escurinho */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000; /* Fica acima do carrinho lateral */
+}
+
+/* Quando o alerta tiver a classe 'visivel' ele aparece */
+.alert-overlay.visivel {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.alert-box {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #d7ccc8; /* Borda sutil marrom */
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.alert-overlay.visivel .alert-box {
+    transform: translateY(0);
+}
+
+.alert-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.alert-box h3 {
+    margin: 0 0 10px 0;
+    color: #000000; /* Marrom escuro */
+    font-family: sans-serif;
+    font-size: 1.3rem;
+}
+
+.alert-box p {
+    margin: 0 0 20px 0;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.alert-box button {
+    background-color: #000000; /* Botão no tom da marcenaria */
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.alert-box button:hover {
+    background-color: #000000;
+}

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LF Arte na Madeira - Tábuas e Petisqueiras Personalizadas</title>
+    <link rel="shortcut icon" href="logo_oficina.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <img src="logo_oficina.png" alt="Logo LF Arte na Madeira" class="logo-img">
+            <h1>LF Arte na Madeira</h1>
+        </div>
+        <p>Tábuas e Petisqueiras Personalizadas para o seu Churrasco</p>
+    </header>
+
+    <div class="filtros-container">
+        <button class="btn-filtro ativo" onclick="filtrarProdutos('todos', this)">Ver Todos</button>
+        <button class="btn-filtro" onclick="filtrarProdutos('tabuas', this)">Tábuas</button>
+        <button class="btn-filtro" onclick="filtrarProdutos('petisqueiras', this)">Petisqueiras</button>
+        <button class="btn-filtro" onclick="filtrarProdutos('decoracao', this)">Decoração</button>
+    </div>
+
+    <button class="btn-carrinho-flutuante" onclick="toggleCarrinho()">
+        🛒 Carrinho (<span id="carrinho-contador">0</span>)
+    </button>
+
+    <div class="carrinho-lateral" id="carrinho-janela">
+        <div class="carrinho-header">
+            <h3>Seu Pedido</h3>
+            <button class="fechar-carrinho" onclick="toggleCarrinho()">✕</button>
+        </div>
+        
+        <div class="carrinho-itens" id="carrinho-lista"></div>
+
+        <div class="carrinho-rodape">
+            <div class="pagamento-container" style="text-align: left; margin-bottom: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                <label style="font-weight: bold; color: #444; display: block; margin-bottom: 5px;">Forma de Pagamento:</label>
+                <select id="forma-pagamento" onchange="toggleOpcoesCartao()" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-family: inherit;">
+                    <option value="Pix">Pix (Melhor Opção)</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                    <option value="Cartão de Débito">Cartão de Débito</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </select>
+
+                <div id="opcoes-cartao" style="display: none; margin-top: 10px;">
+                    <label style="font-weight: bold; color: #444; display: block; margin-bottom: 5px;">Parcelamento:</label>
+                    <select id="parcelas-cartao" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-family: inherit;">
+                        <option value="À vista">À vista</option>
+                        <option value="2x sem juros">2x sem juros</option>
+                        <option value="3x sem juros">3x sem juros</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="carrinho-total">
+                <span>Total:</span>
+                <span id="carrinho-preco-total">R$ 0,00</span>
+            </div>
+            <button class="btn-finalizar" onclick="finalizarNoWhatsapp()"> Finalizar pelo WhatsApp</button>
+        </div>
+    </div>
+
+    <main class="vitrine" id="vitrine-produtos">
+        <p>Carregando produtos...</p>
+    </main>
+
+    <div id="custom-alert" class="alert-overlay">
+        <div class="alert-box">
+            <div class="alert-icon">⚠️</div>
+            <h3>Falta o Nome!</h3>
+            <p>Você marcou a opção de personalização. Por favor, digite o nome que deseja colocar na madeira antes de comprar.</p>
+            <button onclick="fecharAlertaPersonalizado()">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        let todosOsProdutos = [];
+        let carrinho = [];
+
+        async function inicializarLoja() {
+            try {
+                const resCategorias = await fetch('http://localhost:3000/api/categorias');
+                const categorias = await resCategorias.json();
+                
+                const filtrosContainer = document.querySelector('.filtros-container');
+                filtrosContainer.innerHTML = `
+                    <button class="btn-filtro ativo" onclick="filtrarProdutos('todos', this)">Ver Todos</button>
+                    ${categorias.map(c => `<button class="btn-filtro" onclick="filtrarProdutos('${c.id}', this)">${c.nome}</button>`).join('')}
+                `;
+
+                const resProdutos = await fetch('http://localhost:3000/api/produtos');
+                todosOsProdutos = await resProdutos.json();
+                renderizarCards(todosOsProdutos);
+
+            } catch (error) {
+                console.error("Erro ao inicializar:", error);
+                document.getElementById('vitrine-produtos').innerHTML = '<p>Erro ao conectar com a loja.</p>';
+            }
+        }
+
+        function renderizarCards(lista) {
+            const vitrine = document.getElementById('vitrine-produtos');
+            vitrine.innerHTML = ''; 
+
+            if(lista.length === 0) {
+                vitrine.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">Nenhum produto encontrado nesta categoria.</p>';
+                return;
+            }
+
+            lista.forEach(produto => {
+                const card = document.createElement('div');
+                card.className = 'produto-card';
+
+                card.innerHTML = `
+                    <div>
+                        <img src="${produto.imagem_url}" class="produto-img">
+                        <h2 class="produto-nome">${produto.nome}</h2>
+                        
+                        <div class="produto-specs">
+                            <div><strong>Madeira:</strong> ${produto.tipo_madeira || 'Não informada'}</div>
+                            <div> <strong>Tamanho:</strong> ${produto.tamanho || 'Não informado'}</div>
+                        </div>
+
+                        <div class="card-personalizacao">
+                            <label class="card-checkbox-label">
+                                <input type="checkbox" id="personalizar-${produto.id}" onchange="togglePersonalizacaoCard(${produto.id})">
+                                ✍️ Deseja personalizar seu nome na madeira?
+                            </label>
+                            <div id="campo-nome-card-${produto.id}" class="input-nome-card-escondido">
+                                <input type="text" id="nome-gravar-${produto.id}" maxlength="25" placeholder="Digite o seu nome">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="produto-preco">R$ ${produto.preco.toFixed(2)}</p>
+                        <button onclick="adicionarAoCarrinhoComPersonalizacao(${produto.id})">🛒 Comprar</button>
+                    </div>
+                `;
+                
+                vitrine.appendChild(card);
+            });
+        }
+
+        function togglePersonalizacaoCard(idProduto) {
+            const checkbox = document.getElementById(`personalizar-${idProduto}`);
+            const campoNome = document.getElementById(`campo-nome-card-${idProduto}`);
+            const inputTexto = document.getElementById(`nome-gravar-${idProduto}`);
+
+            if (checkbox && checkbox.checked) {
+                campoNome.classList.add('visivel');
+                inputTexto.focus();
+            } else if (campoNome) {
+                campoNome.classList.remove('visivel');
+                inputTexto.value = '';
+            }
+        }
+
+        function toggleCarrinho() {
+            document.getElementById('carrinho-janela').classList.toggle('aberto');
+        }
+
+        function toggleOpcoesCartao() {
+            const formaPagamento = document.getElementById('forma-pagamento').value;
+            const divCartao = document.getElementById('opcoes-cartao');
+            
+            if (formaPagamento === 'Cartão de Crédito') {
+                divCartao.style.display = 'block';
+            } else {
+                divCartao.style.display = 'none';
+            }
+        }
+
+        function adicionarAoCarrinhoComPersonalizacao(id) {
+            const produto = todosOsProdutos.find(p => p.id === id);
+            if (produto) {
+                const checkbox = document.getElementById(`personalizar-${id}`);
+                const inputTexto = document.getElementById(`nome-gravar-${id}`);
+                
+                const querPersonalizar = checkbox ? checkbox.checked : false;
+                const nomeGravacao = querPersonalizar && inputTexto ? inputTexto.value.trim() : '';
+
+                if (querPersonalizar && nomeGravacao === "") {
+                    abrirAlertaPersonalizado(id);
+                    return;
+                }
+
+                const itemParaCarrinho = {
+                    ...produto,
+                    personalizado: querPersonalizar,
+                    nomeGravacao: nomeGravacao
+                };
+
+                carrinho.push(itemParaCarrinho);
+                atualizarCarrinho();
+                
+                if (checkbox) checkbox.checked = false;
+                togglePersonalizacaoCard(id);
+
+                document.getElementById('carrinho-janela').classList.add('aberto');
+            }
+        }
+
+        let idProdutoAtualAlerta = null;
+
+        function abrirAlertaPersonalizado(id) {
+            idProdutoAtualAlerta = id;
+            document.getElementById('custom-alert').classList.add('visivel');
+        }
+
+        function fecharAlertaPersonalizado() {
+            document.getElementById('custom-alert').classList.remove('visivel');
+            
+            if (idProdutoAtualAlerta) {
+                const inputTexto = document.getElementById(`nome-gravar-${idProdutoAtualAlerta}`);
+                if (inputTexto) inputTexto.focus();
+            }
+        }
+
+        function removerDoCarrinho(index) {
+            carrinho.splice(index, 1);
+            atualizarCarrinho();
+        }
+
+        function atualizarCarrinho() {
+            document.getElementById('carrinho-contador').innerText = carrinho.length;
+
+            const listaHTML = document.getElementById('carrinho-lista');
+            listaHTML.innerHTML = '';
+
+            let total = 0;
+
+            carrinho.forEach((item, index) => {
+                total += item.preco;
+                
+                const elemento = document.createElement('div');
+                elemento.className = 'item-carrinho';
+                elemento.innerHTML = `
+                    <div>
+                        <strong>${item.nome}</strong><br>
+                        ${item.personalizado ? `<small style="color: #000000; font-weight: bold;">✒️ Personalizado: "${item.nomeGravacao}"</small><br>` : ''}
+                        <small>R$ ${item.preco.toFixed(2)}</small>
+                    </div>
+                    <button class="btn-remover" onclick="removerDoCarrinho(${index})">✕</button>
+                `;
+                listaHTML.appendChild(elemento);
+            });
+
+            document.getElementById('carrinho-preco-total').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function finalizarNoWhatsapp() {
+            if (carrinho.length === 0) {
+                alert("Seu carrinho está vazio!");
+                return;
+            }
+
+            const numeroWhatsapp = '5517992312812'; 
+
+            const formaPagamento = document.getElementById('forma-pagamento').value;
+            let detalhePagamento = formaPagamento;
+            
+            if (formaPagamento === 'Cartão de Crédito') {
+                const parcelas = document.getElementById('parcelas-cartao').value;
+                detalhePagamento = `Cartão de Crédito (${parcelas})`;
+            }
+
+            let message = `Olá, LF Arte na Madeira! Gostaria de encomendar os seguintes itens:\n\n`;
+            
+            carrinho.forEach((item, i) => {
+                message += `${i + 1}) *${item.nome}*\n`;
+                message += `   🪵 Madeira: ${item.tipo_madeira || 'Não informada'}\n`;
+                message += `   📏 Tamanho: ${item.tamanho || 'Não informado'}\n`;
+                if (item.personalizado && item.nomeGravacao) {
+                    message += `   ✒️ *Gravar nome:* ${item.nomeGravacao}\n`;
+                }
+                message += `   💰 Preço: R$ ${item.preco.toFixed(2)}\n\n`;
+            });
+
+            let totalPedido = carrinho.reduce((acc, p) => acc + p.preco, 0);
+            message += `*Total do Pedido:* R$ ${totalPedido.toFixed(2)}\n`;
+            message += `*Forma de Pagamento:* ${detalhePagamento}\n`;
+
+            const mensagemFormatada = encodeURIComponent(message);
+            window.open(`https://api.whatsapp.com/send?phone=${numeroWhatsapp}&text=${mensagemFormatada}`, '_blank');
+        }
+
+        function filtrarProdutos(categoria, botaoClicado) {
+            document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('ativo'));
+            botaoClicado.classList.add('ativo');
+
+            if (categoria === 'todos') {
+                renderizarCards(todosOsProdutos);
+            } else {
+                const produtosFiltrados = todosOsProdutos.filter(p => p.categoria === categoria);
+                renderizarCards(produtosFiltrados);
+            }
+        }
+
+      async function inicializarLoja() {
+    try {
+        // 1. Mudado para rota relativa (funciona tanto local quanto online)
+        const resCategorias = await fetch('/api/categorias');
+        const categorias = await resCategorias.json();
+        
+        const filtrosContainer = document.querySelector('.filtros-container');
+        filtrosContainer.innerHTML = `
+            <button class="btn-filtro ativo" onclick="filtrarProdutos('todos', this)">Ver Todos</button>
+            ${categorias.map(c => `<button class="btn-filtro" onclick="filtrarProdutos('${c.id}', this)">${c.nome}</button>`).join('')}
+        `;
+
+        // 2. Mudado para rota relativa aqui também
+        const resProdutos = await fetch('/api/produtos');
+        todosOsProdutos = await resProdutos.json();
+        renderizarCards(todosOsProdutos);
+
+    } catch (error) {
+        console.error("Erro ao inicializar:", error);
+        document.getElementById('vitrine-produtos').innerHTML = '<p>Erro ao conectar com a loja.</p>';
+    }
+}
+    </script>
+</body>
+</html>
