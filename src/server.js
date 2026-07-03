@@ -11,8 +11,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 
-// 📂 Define a pasta 'public' para servir o HTML, CSS e Imagens de forma correta
-app.use(express.static(path.resolve(process.cwd(), 'public')));
+
 
 // Configurações de tamanho para aguentar fotos em Base64
 app.use(cors());
@@ -117,8 +116,6 @@ app.delete('/api/categorias/:id', async (req, res) => {
 });
 
 // Rota principal: entrega o arquivo correto de dentro da pasta public
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve(process.cwd(), 'public', 'index.html'));
-});
+
 
 export default app;
