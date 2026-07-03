@@ -3,6 +3,7 @@ import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Carrega o .env APENAS se estiver rodando localmente (em desenvolvimento)
 if (process.env.NODE_ENV !== 'production') {
@@ -11,12 +12,21 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 
-
+// Paths de arquivos no ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicPath = path.join(__dirname, '..', 'public');
 
 // Configurações de tamanho para aguentar fotos em Base64
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.static(publicPath));
+
+// Fallback para o SPA: entrega o index para qualquer rota que não seja /api
+app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+});
 
 // 🔌 Conexão com o Supabase (puxa tanto do .env local quanto das variáveis da Vercel)
 const supabaseUrl = process.env.SUPABASE_URL;
