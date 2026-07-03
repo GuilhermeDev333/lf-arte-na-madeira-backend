@@ -403,11 +403,11 @@
         // --- CARREGAR DADOS DO BACKEND ---
         async function carregarDados() {
             try {
-                const resCat = await fetch('http://localhost:3000/api/categorias');
+                const resCat = await fetch('/api/categorias');
                 const categorias = await resCat.json();
                 renderizarCategorias(categorias);
 
-                const resProd = await fetch('http://localhost:3000/api/produtos');
+                const resProd = await fetch('/api/produtos');
                 const produtos = await resProd.json();
                 renderizarProdutos(produtos);
             } catch (error) {
@@ -563,7 +563,7 @@ function renderizarCategorias(categorias) {
         // --- REMOVER PRODUTO DIRETO ---
         async function excluirProduto(id) {
             try {
-                const res = await fetch(`http://localhost:3000/api/produtos/${id}`, {
+                const res = await fetch(`/api/produtos/${id}`, {
                     method: 'DELETE'
                 });
                 if(res.ok) {
@@ -580,7 +580,7 @@ function renderizarCategorias(categorias) {
         // --- REMOVER CATEGORIA DIRETA ---
         async function excluirCategoria(id) {
             try {
-                const res = await fetch(`http://localhost:3000/api/categorias/${id}`, {
+                const res = await fetch(`/api/categorias/${id}`, {
                     method: 'DELETE'
                 });
 

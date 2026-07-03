@@ -83,7 +83,7 @@
 
         async function inicializarLoja() {
             try {
-                const resCategorias = await fetch('http://localhost:3000/api/categorias');
+                const resCategorias = await fetch('/api/categorias');
                 const categorias = await resCategorias.json();
                 
                 const filtrosContainer = document.querySelector('.filtros-container');
@@ -92,7 +92,7 @@
                     ${categorias.map(c => `<button class="btn-filtro" onclick="filtrarProdutos('${c.id}', this)">${c.nome}</button>`).join('')}
                 `;
 
-                const resProdutos = await fetch('http://localhost:3000/api/produtos');
+                const resProdutos = await fetch('/api/produtos');
                 todosOsProdutos = await resProdutos.json();
                 renderizarCards(todosOsProdutos);
 
